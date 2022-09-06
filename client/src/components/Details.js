@@ -269,7 +269,7 @@ export default function Details(props) {
                                     <TableCell component="th" scope="row">
                                         Amount
                                     </TableCell>
-                                    <TableCell align="right">{movieshow?.price}</TableCell>
+                                    <TableCell align="right">{(movieshow?.price)*noOfSeats}</TableCell>
 
                                 </TableRow>
                             </TableBody>
