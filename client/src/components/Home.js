@@ -19,6 +19,7 @@ import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 // import jwt from "jsonwebtoken";
 import { useJwt } from "react-jwt";
@@ -39,6 +40,7 @@ const ExpandMore = styled((props) => {
   }),
 }));
 export default function Home() {
+  const location= useLocation();
   async function addMovie(){
     // event.preventDefault();
     const req=await fetch('http://localhost:8000/addmovie',{
@@ -108,6 +110,16 @@ export default function Home() {
 
   function autoSlide() {
     // let that = images;
+    // let count = images.length;
+    // localStorage.setItem('i','0');
+    // setInterval(function () {
+    //   setActiveStep(parseInt(localStorage.getItem('i')));
+    //   localStorage.setItem('i',(parseInt(localStorage.getItem('i'))+1));
+    //   if (count === (parseInt(localStorage.getItem('i')))) {
+    //     localStorage.setItem('i','0');//resets
+    //   }
+    // }, 3000);
+
     let count = images.length;
     let i = 0;
     setInterval(function () {
@@ -118,10 +130,10 @@ export default function Home() {
         i = 0;//resets
       }
     }, 3000);
+
     // setInterval(function () {
       
-    //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    //   console.log(activeStep);
+    //   setActiveStep( activeStep + 1);
     //   if (count === activeStep) {
     //     setActiveStep(0);//resets
     //   }
@@ -131,7 +143,7 @@ export default function Home() {
   // React.useEffect(()=>{ },[setActiveStep(activeStep)])
 
   React.useEffect(
-    autoSlide, [images.length]);
+    autoSlide, []);
 
   // const [quote,setQuote]=React.useState("");
   // const [tempQuote,setTempQuote]=React.useState("");
@@ -235,6 +247,8 @@ export default function Home() {
         <input type="submit" value="Update Quote" />
       </form>
       </div> */}
+      {activeStep>(images.length-1)?
+        setActiveStep(activeStep-images.length):
       <Box sx={{ width: '100%', flexGrow: 1 }}>
         <Paper
           square
@@ -302,6 +316,7 @@ export default function Home() {
           }
         />
       </Box>
+}
       <Box
         sx={{
           mx: '10%',
