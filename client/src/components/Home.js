@@ -41,34 +41,34 @@ const ExpandMore = styled((props) => {
 }));
 export default function Home() {
   const location= useLocation();
-  async function addMovie(){
-    // event.preventDefault();
-    const req=await fetch('http://localhost:8000/addmovie',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-      },
-    })
-    const data=await req.json();
-    console.log(data);
-  }
+  // async function addMovie(){
+  //   // event.preventDefault();
+  //   const req=await fetch('http://localhost:8000/addmovie',{
+  //     method:'POST',
+  //     headers:{
+  //       'Content-Type':'application/json',
+  //     },
+  //   })
+  //   const data=await req.json();
+  //   console.log(data);
+  // }
 
-  async function addAuditorium(){
-    await fetch('http://localhost:8000/addauditorium',{
-      method:'POST',
-    })
-  }
+  // async function addAuditorium(){
+  //   await fetch('http://localhost:8000/addauditorium',{
+  //     method:'POST',
+  //   })
+  // }
 
-  async function addMovieShow(){
-    await fetch('http://localhost:8000/addmovieshow',{
-      method:'POST',
-    })
-  }
+  // async function addMovieShow(){
+  //   await fetch('http://localhost:8000/addmovieshow',{
+  //     method:'POST',
+  //   })
+  // }
 
   // React.useEffect(()=>{
-  //   addMovie();
-  //   addAuditorium(); 
-  //   addMovieShow();
+  //   // addMovie();
+  //   // addAuditorium(); 
+  //   // addMovieShow();
   // },[])
 
   React.useEffect(()=>{populateMovies();},[])

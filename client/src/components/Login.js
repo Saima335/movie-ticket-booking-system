@@ -18,6 +18,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import EmailIcon from '@mui/icons-material/Email';
 import Header from './Header';
 import Footer from './Footer';
+import Alert from '@mui/material/Alert';
 
 const CTextField = styled(TextField)({
   // '& label.Mui-focused': {
@@ -51,6 +52,13 @@ export default function Login() {
   const [email,setEmail]=React.useState("");
   const [password,setPassword]=React.useState("");
 
+  const [error, setError] = React.useState({
+    status:false,
+    msg:'',
+    type:'',
+    label:''
+  });
+
   // const handleChange =
   //   (prop) => (event) => {
   //     setValues({ ...values, [prop]: event.target.value });
@@ -77,6 +85,13 @@ export default function Login() {
 
   async function loginUser(event){
     event.preventDefault();
+    if(!email){
+      setError({status:true,msg:'Email is required', type:'error', label:'Error'});
+    }
+    else if(!password){
+      setError({status:true,msg:'Password is required', type:'error', label:'Error'});
+    }
+    else{
       const response = await fetch("http://localhost:8000/api/login",{
       method:'POST',
       headers:{
@@ -90,12 +105,15 @@ export default function Login() {
     const data=await response.json();
     if(data.user){
       localStorage.setItem('token',data.user);
-      alert('Login Successfull!');
+      setError({status:true,msg:'Login Successfull', type:'success', label:'Success'});
+      // alert('Login Successfull!');
       window.location.href="/";
     }
     else{
-      alert('Please check your username and password');
+      setError({status:true,msg:'Please check your username and password', type:'error', label:'Error'});
+      // alert('Please check your username and password');
     }
+  }
   }
 
 
@@ -129,6 +147,11 @@ export default function Login() {
           Sign in
         </Typography>
         <Box component="form" noValidate onSubmit={loginUser} sx={{ mt: 1, color:'white', }}>
+        {error.status &&(
+          <Box>
+            <Alert severity={error.type} >{error.msg}</Alert>
+          </Box>
+        )}
           <CTextField
           InputProps={{
             startAdornment: (

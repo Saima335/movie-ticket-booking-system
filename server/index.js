@@ -16,7 +16,8 @@ app.use(express.json());
 mongoose.connect('mongodb://localhost:27017/movie-ticket-booking');
 
 var user;
-var auditorium;
+var auditorium1;
+var auditorium2;
 var movies;
 
 app.post('/api/register', async (req,res)=>{
@@ -132,9 +133,14 @@ app.get('/movies',async(req, res) => {
 
 app.post('/addauditorium', async (req,res)=>{
     try{
-        auditorium=await Auditorium.create({
+        auditorium1=await Auditorium.create({
             name:"Hall",
             capacity:50
+        });
+
+        auditorium2=await Auditorium.create({
+            name:"Theature",
+            capacity:10
         });
         
         res.json({status:'ok'});
@@ -160,32 +166,45 @@ app.post('/addmovieshow', async (req,res)=>{
             price:1000,
             startTime:"09:00 AM",
             endTime:"12:00 AM",
-            auditorium:auditorium._id,
+            auditorium:auditorium1._id,
             movie:(await Movie.findOne({label:"Raya and the Last Dragon"}))._id,
+            date:"17-09-2022",
+        });
+
+        await MovieShow.create({
+            price:800,
+            startTime:"12:00 AM",
+            endTime:"2:00 AM",
+            auditorium:auditorium2._id,
+            movie:(await Movie.findOne({label:"Raya and the Last Dragon"}))._id,
+            date:"17-09-2022",
         });
 
         await MovieShow.create({
             price:500,
             startTime:"05:00 PM",
             endTime:"08:00 PM",
-            auditorium:auditorium._id,
+            auditorium:auditorium1._id,
             movie:(await Movie.findOne({label:"Tangled"}))._id,
+            date:"18-09-2022",
         });
 
         await MovieShow.create({
             price:500,
             startTime:"09:00 PM",
             endTime:"12:00 PM",
-            auditorium:auditorium._id,
+            auditorium:auditorium1._id,
             movie:(await Movie.findOne({label:"Legends"}))._id,
+            date:"19-09-2022",
         });
 
         await MovieShow.create({
             price:800,
             startTime:"02:00 PM",
             endTime:"05:00 PM",
-            auditorium:auditorium._id,
+            auditorium:auditorium1._id,
             movie:(await Movie.findOne({label:"Incredibles 2"}))._id,
+            date:"19-09-2022",
         });
         
         res.json({status:'ok'});
@@ -213,6 +232,39 @@ app.get('/movieshows/:name',async(req, res) => {
     }
     catch(err){
         res.json({status:'error',error:'Error occured while getting Movie Shows'});
+    }
+});
+
+app.get('/movieshows/:name/:auditoriumid',async(req, res) => {
+    try{
+        const movie=await Movie.findOne({'label':req.params.name});
+        movieshows=await MovieShow.find({'movie':movie._id,'auditorium':req.params.auditoriumid});
+        res.json({status:'ok',movieshows:movieshows});
+    }
+    catch(err){
+        // res.json({status:'error',error:'Error occured while getting Movie Shows'});
+    }
+});
+
+app.get('/seatsavailable/:movieshowid/:noOfSeats',async(req, res) => {
+    try{
+        const movieshow=await MovieShow.findOne({'_id':req.params.movieshowid}).populate('auditorium');
+        const bookings=await Booking.find({'movieshow':movieshow._id});
+        console.log(bookings);
+        var seats=0;
+        for(var i=0;i<bookings.length;i++){
+            seats+=bookings[i].no_of_seats
+        }
+        available_seats=movieshow.auditorium.capacity-seats;
+        if(req.params.noOfSeats>available_seats){
+            res.json({status:'error',available_seats:available_seats});
+        }
+        else{
+            res.json({status:'ok'});
+        }
+    }
+    catch(err){
+        res.json({status:'errorOccur',error:'Error occured'});
     }
 });
 

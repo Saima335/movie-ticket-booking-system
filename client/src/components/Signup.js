@@ -56,6 +56,12 @@ export default function Login() {
       const [cpassword,setCpassword]=React.useState("");
       const [open, setOpen] = React.useState(true);
       const [match,setMatch]=React.useState(true);
+      const [error, setError] = React.useState({
+        status:false,
+        msg:'',
+        type:'',
+        label:''
+      });
     
       // const handleChange =
       //   (prop) => (event) => {
@@ -84,9 +90,21 @@ export default function Login() {
   async function registerUser(event){
     event.preventDefault();
     if (password!==cpassword){
-      setMatch(false);
+      setError({status:true,msg:'Password and Confirm Password does not match', type:'error', label:'Error'});
       // alert("Password and Confirm Password doesn't match!");
     }
+    else if(!name){
+      setError({status:true,msg:'Name is required', type:'error', label:'Error'});
+    }
+    else if(!email){
+      setError({status:true,msg:'Email is required', type:'error', label:'Error'});
+    }
+    else if(!password){
+      setError({status:true,msg:'Password is required', type:'error', label:'Error'});
+    }
+    // else if(!cpassword){
+    //   setError({status:true,msg:'Confirm Password is required', type:'error', label:'Error'});
+    // }
     else{
       const response = await fetch("http://localhost:8000/api/register",{
       method:'POST',
@@ -138,30 +156,32 @@ export default function Login() {
           Create an Account
         </Typography>
         <Box component="form" noValidate onSubmit={registerUser} sx={{ mt: 1, color:'white', }}>
-        {!match?
-        // <Collapse in={open}>
+        {error.status &&(
+          <Box>
+            <Alert severity={error.type} >{error.msg}</Alert>
+       {/* <Collapse in={open}>
         <Alert
-          severity="error"
-          // action={
-          //   <IconButton
-          //     aria-label="close"
-          //     color="inherit"
-          //     size="small"
-          //     onClick={() => {
-          //       setOpen(false);
-          //     }}
-          //   >
-          //     <CloseIcon fontSize="inherit" />
-          //   </IconButton>
-          // }
+          severity={error.type}
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
           sx={{ mb: 2 }}
         >
-          <AlertTitle>Error</AlertTitle>
-          Password and Confirm Password doesn't match!
+          <AlertTitle>{error.label}</AlertTitle>
+          {error.msg}
         </Alert>
-      // </Collapse>
-      :<Box></Box>
-      }
+       </Collapse> */}
+      </Box>
+      )}
         <CTextField
             InputProps={{
                 startAdornment: (

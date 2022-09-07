@@ -2,7 +2,7 @@ const mongoose=require('mongoose');
 
 const Movie=new mongoose.Schema(
     {
-        label:{type:String, required:true},
+        label:{type:String, required:true, unique:true},
         imgPath:{type:String, required:true},
         backgroundImage:{type:String, required:true},
         date:{type:String, required:true},

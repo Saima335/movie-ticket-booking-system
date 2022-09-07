@@ -32,6 +32,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {useLocation} from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import Alert from '@mui/material/Alert';
 
 const CTextField = styled(TextField)({
     //   '& label.Mui-focused': {
@@ -92,8 +93,16 @@ export default function Details(props) {
 
     const [noOfSeats,setNoOfSeats]=React.useState(1);
     const [auditoriums,setAuditoriums]=React.useState([]);
+    const [auditorium,setAuditorium]=React.useState([]);
     const [movieShows,setMovieShows]=React.useState([]);
     const [movieshow,setMovieshow]=React.useState([]);
+
+    const [error, setError] = React.useState({
+        status:false,
+        msg:'',
+        type:'',
+        label:''
+      });
 
     async function populateAuditoriums(){
         const req=await fetch('http://localhost:8000/auditoriums',{
@@ -108,11 +117,28 @@ export default function Details(props) {
         else{
           alert(data.error);
         }
-        console.log('Auditoriums',data);
+        // console.log('Auditoriums',data);
       }
 
-      async function populateMovieShows(){
-        const req=await fetch('http://localhost:8000/movieshows/'+location.state.label,{
+    //   async function populateMovieShows(){
+    //     const req=await fetch('http://localhost:8000/movieshows/'+location.state.label,{
+    //       headers:{
+    //         'x-access-token':localStorage.getItem('token'),
+    //       },
+    //     })
+    //     const data=await req.json();
+    //     if(data.status==='ok'){
+    //       setMovieShows(data.movieshows);
+    //     }
+    //     else{
+    //       alert(data.error);
+    //     }
+    //     console.log('Movie Shows',data);
+    //   }
+
+    async function populateMovieShows(){
+        console.log(auditorium);
+        const req=await fetch('http://localhost:8000/movieshows/'+location.state.label+'/'+auditorium._id,{
           headers:{
             'x-access-token':localStorage.getItem('token'),
           },
@@ -127,29 +153,56 @@ export default function Details(props) {
         console.log('Movie Shows',data);
       }
 
-      React.useEffect(() => {populateAuditoriums(); populateMovieShows();},[])
+      React.useEffect(() => {populateAuditoriums();},[])
+      React.useEffect(() => {populateMovieShows();},[auditorium])
+
 
     async function addBooking(){
         // event.preventDefault();
-        const req=await fetch('http://localhost:8000/addbooking',{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json',
-            'x-access-token':localStorage.getItem('token'),
-        },
-        body: JSON.stringify({
-            no_of_seats:noOfSeats,
-            movieshowid: movieshow._id,
-        })
-        })
-        const data=await req.json();
-        if(data){
-            alert("Booking done successfully");
+        if(!auditorium._id){
+            setError({status:true,msg:'Please select auitorium', type:'error', label:'Error'});
+          }
+          else if(!movieshow._id){
+            setError({status:true,msg:'Please select movie show', type:'error', label:'Error'});
+          }
+          else{
+            const req=await fetch('http://localhost:8000/seatsavailable/'+movieshow._id+'/'+noOfSeats,{
+                headers:{
+                    'x-access-token':localStorage.getItem('token'),
+                },
+            })
+            const data=await req.json();
+            if(data.status==='error'){
+                if (data.available_seats==0){
+                    setError({status:true,msg:'No Seats Available', type:'error', label:'Error'});
+                }
+                else{
+                    setError({status:true,msg:'Only '+data.available_seats+' Seats Available', type:'info', label:'Info'});
+                }
+            }
+            else{
+                const req=await fetch('http://localhost:8000/addbooking',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'x-access-token':localStorage.getItem('token'),
+                    },
+                    body: JSON.stringify({
+                        no_of_seats:noOfSeats,
+                        movieshowid: movieshow._id,
+                    })
+                })
+                const data=await req.json();
+                if(data){
+                    setError({status:true,msg:'Booking Done Successfully', type:'success', label:'Success'});
+                    // alert("Booking done successfully");
+                }
+                else{
+                    alert(data.error);
+                }
+                console.log(data);
+            }
         }
-        else{
-        alert(data.error);
-        }
-        console.log(data);
     }
 
     return (
@@ -180,6 +233,11 @@ export default function Details(props) {
                     boxShadow: 3, color: 'white',
                 }}>
                     <img src={location.state.titleImage} height={200} width={400}></img>
+                    {error.status &&(
+          <Box>
+            <Alert severity={error.type} sx={{py:2, my:2}}>{error.msg}</Alert>
+          </Box>
+        )}
                     <TableContainer component={Paper}>
                         <Table sx={{ minWidth: 400 }} aria-label="simple table">
                             <TableHead>
@@ -199,12 +257,14 @@ export default function Details(props) {
                                     </TableCell>
                                     <TableCell align="right">
                                     <FormControl fullWidth>
-                                            <InputLabel id="auditorium">Auditorium</InputLabel>
+                                            <InputLabel id="auditorium">Select Auditorium</InputLabel>
                                             <Select
                                                 labelId="auditorium"
                                                 id="auditorium"
 
                                                 label="Auditorium"
+                                                value={auditorium}
+                                                onChange={(e)=>{setAuditorium(e.target.value);}}
 
                                             >
                                                 {auditoriums.map(auditorium=>(<MenuItem value={auditorium}>{auditorium.name}</MenuItem>))}
@@ -219,11 +279,11 @@ export default function Details(props) {
                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                 >
                                     <TableCell component="th" scope="row">
-                                        Show Time
+                                        Date and Time
                                     </TableCell>
                                     <TableCell align="right">
                                         <FormControl fullWidth>
-                                            <InputLabel id="time">Time</InputLabel>
+                                            <InputLabel id="time">Select Date and Time</InputLabel>
                                             <Select
                                                 labelId="time"
                                                 id="time"
@@ -233,7 +293,7 @@ export default function Details(props) {
                                                 onChange={(e)=>setMovieshow(e.target.value)}
 
                                             >
-                                                {movieShows.map(ms=>(<MenuItem value={ms}>{ms.startTime}-{ms.endTime}</MenuItem>))}
+                                                {movieShows.map(ms=>(<MenuItem value={ms}>Date: {ms.date} Time: {ms.startTime}-{ms.endTime}</MenuItem>))}
                                             </Select>
                                         </FormControl>
                                     </TableCell>
@@ -251,7 +311,7 @@ export default function Details(props) {
                                             type="number"
                                             InputProps={{
                                                 inputProps: { 
-                                                    min: 1, max:5
+                                                    min: 1, max:6
                                                 }
                                             }}
                                             sx={{}}

@@ -41,7 +41,7 @@ export default function History() {
       },
     })
     const data=await req.json();
-    alert("Booking deleted successfully")
+    //alert("Booking deleted successfully")
     populateData();
     // setUser(data.user);
     console.log(data);
