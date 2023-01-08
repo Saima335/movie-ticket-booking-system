@@ -21,7 +21,6 @@ login = driver.find_element("xpath" ,'//*[@id="root"]/div/div/div/div/form/butto
 login.click()
 
 time.sleep(3)
-driver.refresh()
 
 search = driver.find_element("xpath" ,'//*[@id="root"]/div/div/div/div/header/div/div/div[4]/button[2]')
 search.click()
@@ -37,4 +36,4 @@ searchbutton.click()
 
 time.sleep(15)
 
-print("end")
+print("pass")
