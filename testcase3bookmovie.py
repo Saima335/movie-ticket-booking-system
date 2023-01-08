@@ -22,7 +22,6 @@ login = driver.find_element("xpath" ,'//*[@id="root"]/div/div/div/div/form/butto
 login.click()
 
 time.sleep(5)
-driver.refresh()
 
 bookform = driver.find_element("xpath" ,'//*[@id="root"]/div/div/div/div/div[2]/div[1]/div[2]/div/div[3]/button[1]')
 bookform.click()
@@ -48,7 +47,6 @@ book= driver.find_element("xpath" ,'//*[@id="root"]/div/div/div/div/div/div/butt
 book.click()
 time.sleep(3)
 
-driver.refresh()
 time.sleep(10)
 
-print("end")
+print("pass")
