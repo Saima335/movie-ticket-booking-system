@@ -21,13 +21,11 @@ login = driver.find_element("xpath" ,'//*[@id="root"]/div/div/div/div/form/butto
 login.click()
 
 time.sleep(5)
-driver.refresh()
 
 history = driver.find_element("xpath" ,'//*[@id="root"]/div/div/div/div/header/div/div/div[4]/button[3]')
 history.click()
 time.sleep(3)
 
-driver.refresh()
 time.sleep(10)
 
-print("end")
+print("pass")
